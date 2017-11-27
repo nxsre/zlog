@@ -1,0 +1,5 @@
+package: github.com/soopsio/zlog
+import:
+- package: github.com/soopsio/ulog
+- package: go.uber.org/zap
+- package: go.uber.org/zap/zapcore

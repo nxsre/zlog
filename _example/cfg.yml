@@ -1,0 +1,10 @@
+zap.zapbeat:
+    enable: true
+
+zap.file:
+    enable: true
+    path: /var/log/test
+    filename: logfile
+    rotate_every_kb: 102400
+    number_of_files: 7
+ 

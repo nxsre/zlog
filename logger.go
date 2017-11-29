@@ -21,6 +21,12 @@
 package zlog
 
 import (
+	"log"
+
+	"github.com/soopsio/zlog/drivers/file"
+	"github.com/soopsio/zlog/drivers/zapbeat"
+
+	"go.uber.org/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -40,4 +46,58 @@ func SetOutput(ws zapcore.WriteSyncer, conf zap.Config) zap.Option {
 	return zap.WrapCore(func(zapcore.Core) zapcore.Core {
 		return zapcore.NewCore(enc, ws, conf.Level)
 	})
+}
+
+type ZapWriteSyncerInterface interface {
+	Sync() error
+}
+
+type ZapWriteSyncer struct {
+	writeSyncer []zapcore.WriteSyncer
+}
+
+// Write 调用底层驱动 io.Writer 实现
+func (zws *ZapWriteSyncer) Write(p []byte) (n int, err error) {
+	for _, v := range zws.writeSyncer {
+		v.Write(p)
+	}
+	return len(p), nil
+}
+
+// Sync 调用底层驱动 Sync 方法
+func (zws *ZapWriteSyncer) Sync() error {
+	// TODO: 如果是写文件，或者 kafka ，此处应该等待写入完毕
+	for _, v := range zws.writeSyncer {
+		v.Sync()
+	}
+	return nil
+}
+
+func NewWriteSyncer(provider config.Provider) zapcore.WriteSyncer {
+	zapWriteSyncer := &ZapWriteSyncer{}
+	var syncWriters []zapcore.WriteSyncer
+	if output_zapbeat := provider.Get("zap.zapbeat"); output_zapbeat.HasValue() {
+		syncWriter, err := zapbeat.NewWriteSyncer(output_zapbeat)
+		if err != nil {
+			log.Println("zapbeat 初始化失败:", err)
+		} else {
+			if syncWriter != nil {
+				log.Println(syncWriter)
+				syncWriters = append(syncWriters, syncWriter)
+			}
+		}
+	}
+
+	if output_file := provider.Get("zap.file"); output_file.HasValue() {
+		syncWriter, err := file.NewWriteSyncer(output_file)
+		if err != nil {
+			log.Println("file 初始化失败:", err)
+		} else {
+			if syncWriter != nil {
+				syncWriters = append(syncWriters, syncWriter)
+			}
+		}
+	}
+	zapWriteSyncer.writeSyncer = syncWriters
+	return zapWriteSyncer
 }

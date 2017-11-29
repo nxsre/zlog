@@ -1,0 +1,5 @@
+= Zlogbeat Docs
+
+Welcome to the Zlogbeat documentation.
+
+

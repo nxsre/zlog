@@ -1,0 +1,33 @@
+logging.level: info
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 5s
+
+# https://www.elastic.co/guide/en/beats/filebeat/current/configuration-general-options.html
+zlogbeat:
+  period: 0.1s
+  fields: {project: "go-sshd11", instance-id: "574734885120952459"}
+ 
+# https://www.elastic.co/guide/en/beats/filebeat/current/redis-output.html
+output.redis:
+    enable: true
+    hosts: ["10.10.89.127:7777"] 
+    datatype: list
+    key: zapbeat # 或者 index 二选一，表示 redis 中的键，index 对应 @metadata -> beat 字段，使用 key 时，此字段为空, index 即将被去掉支持
+    db: 0
+    # password: ""
+    timeout: 5
+    max_retries: 3
+    bulk_max_size: 0
+    worker: 1
+    loadbalance: false
+    # key: "default_list"
+    keys:
+    # - key: "info_list"   # send to info_list if `message` field contains INFO
+    #   when.contains:
+    #     fields.level: "info"
+
+    - key: "%{[fields][project]}"
+      mappings:
+        "go-sshd": "go-sshd_list"

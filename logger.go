@@ -82,7 +82,6 @@ func NewWriteSyncer(provider config.Provider) zapcore.WriteSyncer {
 			log.Println("zapbeat 初始化失败:", err)
 		} else {
 			if syncWriter != nil {
-				log.Println(syncWriter)
 				syncWriters = append(syncWriters, syncWriter)
 			}
 		}

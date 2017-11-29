@@ -35,8 +35,9 @@ func test_zlogbeat() {
 				EncodeDuration: zapcore.SecondsDurationEncoder,
 				EncodeCaller:   zapcore.ShortCallerEncoder,
 			}).EncodeEntry(entry, nil)
-			fmt.Println(bf.String(), err)
-			ch <- []byte(bf.String())
+			if err == nil {
+				ch <- []byte(bf.String())
+			}
 
 			time.Sleep(time.Millisecond * 500)
 		}
@@ -45,13 +46,13 @@ func test_zlogbeat() {
 		zlogbt.Stop()
 	}()
 
-	// 添加 -c 选项，指定配置文件路径
+	// 解析 -c 选项，指定配置文件路径
 	c := flag.CommandLine.Lookup("c")
-	c.Value.Set("E:\\Zmodem\\filebeat.yml")
+	// c.Value.Set("zlogbeat.yml")
 
-	// 添加 -e 选项
+	// 解析 -e 选项
 	e := flag.CommandLine.Lookup("e")
-	fmt.Println(e.Value.Set("true"))
+	e.Value.Set("true")
 
 	cmd.RootCmd.PersistentFlags().AddGoFlag(c)
 	cmd.RootCmd.PersistentFlags().AddGoFlag(e)

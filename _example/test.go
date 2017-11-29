@@ -5,16 +5,18 @@ import (
 	"log"
 
 	"github.com/soopsio/zlog"
+	"github.com/soopsio/zlog/zlogbeat/cmd"
 	"go.uber.org/config"
 	"go.uber.org/zap"
 )
 
 var (
-	logger *zap.Logger
+	logger  *zap.Logger
+	cfgfile = flag.String("logconf", "cfg.yml", "main log config file.")
 )
 
 func main() {
-	cfgfile := flag.String("conf", "cfg.yml", "main log config path")
+	cmd.RootCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("logconf"))
 	flag.Parse()
 	p, err := config.NewYAMLProviderFromFiles(*cfgfile)
 	if err != nil {

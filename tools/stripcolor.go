@@ -10,8 +10,8 @@ func StripAnsiColor(str string) string {
 			repl  string
 		}{
 			{
-				regex: regexp.MustCompile(`\[(3[1-8]|0)m`),
-				repl:  "\033[${1}m",
+				regex: regexp.MustCompile(`\x1b\[[0-9;]*m`),
+				repl:  "",
 			},
 			{
 				regex: regexp.MustCompile(`\[39m`),

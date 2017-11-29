@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/soopsio/zlog/tools"
 )
 
@@ -11,6 +12,7 @@ const src = "déjà vu" + // precomposed unicode
 	"as⃝df̅" // unicode combining characters
 
 func main() {
+	color.Blue("Prints %s in blue.", "text")
 	fmt.Println("source text:")
 	fmt.Println(src)
 	fmt.Println("\nas bytes, stripped of control codes:")

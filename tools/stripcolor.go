@@ -2,6 +2,7 @@ package tools
 
 import "regexp"
 
+// https://github.com/marthjod/recolor
 func StripAnsiColor(str string) string {
 	var (
 		replacements = []struct {

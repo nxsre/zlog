@@ -7,6 +7,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+// https://rosettacode.org/wiki/Strip_control_codes_and_extended_characters_from_a_string
 // two byte-oriented functions identical except for operator comparing c to 127.
 func StripCtlFromBytes(str string) string {
 	b := make([]byte, len(str))

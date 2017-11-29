@@ -20,9 +20,9 @@ func StripAnsiColor(str string) string {
 	)
 
 	for _, replacement := range replacements {
-		if replacement.regex.MatchString(line) {
-			line = replacement.regex.ReplaceAllString(line, replacement.repl)
+		if replacement.regex.MatchString(str) {
+			str = replacement.regex.ReplaceAllString(str, replacement.repl)
 		}
 	}
-	return line
+	return str
 }

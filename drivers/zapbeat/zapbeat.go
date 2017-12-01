@@ -2,7 +2,6 @@ package zapbeat
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"time"
 
@@ -35,7 +34,6 @@ func init() {
 		if err := cmd.RootCmd.Execute(); err != nil {
 			os.Exit(1)
 		}
-		fmt.Println("cmd.RootCmd 结束")
 	}()
 }
 

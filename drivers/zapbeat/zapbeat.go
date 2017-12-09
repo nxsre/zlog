@@ -2,9 +2,11 @@ package zapbeat
 
 import (
 	"flag"
+	"io"
 	"os"
-	"time"
+	"sync"
 
+	"github.com/oleiade/lane"
 	"github.com/soopsio/zlog/zlogbeat/beater"
 	"github.com/soopsio/zlog/zlogbeat/cmd"
 	"go.uber.org/config"
@@ -12,13 +14,13 @@ import (
 )
 
 // 全局日志 channel
-var ch = make(chan []byte)
-var zlogbt = beater.GetZlogbeat()
+var ch chan []byte
+var logqueue *lane.Queue
+var zlogbt = beater.NewZlogbeat()
+var logwriter io.Writer
 
 func init() {
-
-	zlogbt.SetLogCh(ch)
-
+	logwriter, _ = zlogbt.GetLogWriter()
 	go func() {
 		// 启动 beater
 		// 添加 -c 选项，指定配置文件路径
@@ -37,17 +39,13 @@ func init() {
 	}()
 }
 
-type BeatWriter struct{}
+type BeatWriter struct {
+	lock *sync.RWMutex
+}
 
 func (sw *BeatWriter) Write(p []byte) (n int, err error) {
-	timer := time.NewTimer(time.Second * 5)
-	n = len(p)
-	select {
-	case ch <- p:
-	case <-timer.C:
-		timer.Reset(time.Second * 5)
-	}
-	return n, err
+	n, err = logwriter.Write(p)
+	return
 }
 
 type BeatWriteSyncer struct {
@@ -66,7 +64,11 @@ func NewWriteSyncer(p config.Value) (zapcore.WriteSyncer, error) {
 		return nil, err
 	}
 	if conf.Enable {
-		return &BeatWriteSyncer{}, nil
+		return &BeatWriteSyncer{
+			BeatWriter: BeatWriter{
+				lock: &sync.RWMutex{},
+			},
+		}, nil
 	}
 	return nil, err
 }

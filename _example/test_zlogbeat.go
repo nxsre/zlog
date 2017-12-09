@@ -11,10 +11,9 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func test_zlogbeat() {
-	ch := make(chan []byte)
-	zlogbt := beater.GetZlogbeat()
-	zlogbt.SetLogCh(ch)
+func main() {
+	zlogbt := beater.NewZlogbeat()
+	lw, _ := zlogbt.GetLogWriter()
 	go func() {
 		for i := 0; i <= 10; i++ {
 			entry := zapcore.Entry{
@@ -36,7 +35,7 @@ func test_zlogbeat() {
 				EncodeCaller:   zapcore.ShortCallerEncoder,
 			}).EncodeEntry(entry, nil)
 			if err == nil {
-				ch <- []byte(bf.String())
+				lw.Write(bf.Bytes())
 			}
 
 			time.Sleep(time.Millisecond * 500)

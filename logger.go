@@ -23,9 +23,9 @@ package zlog
 import (
 	"log"
 
+	"github.com/soopsio/go-utils/strutils"
 	"github.com/soopsio/zlog/drivers/file"
 	"github.com/soopsio/zlog/drivers/zapbeat"
-
 	"go.uber.org/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -58,6 +58,7 @@ type ZapWriteSyncer struct {
 
 // Write 调用底层驱动 io.Writer 实现
 func (zws *ZapWriteSyncer) Write(p []byte) (n int, err error) {
+	p = []byte(strutils.DeSensitization(string(p)))
 	for _, v := range zws.writeSyncer {
 		v.Write(p)
 	}
